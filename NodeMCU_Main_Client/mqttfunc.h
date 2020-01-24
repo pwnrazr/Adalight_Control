@@ -19,6 +19,7 @@ void subscribemqtt()
   client.subscribe("/adalight/G");
   client.subscribe("/adalight/B");
   client.subscribe("/adalight/welcomemessage");
+  client.subscribe("/main_node/reboot");
 }
 
 void reconnect() {

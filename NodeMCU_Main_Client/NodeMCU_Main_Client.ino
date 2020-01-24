@@ -87,6 +87,11 @@ void callback(char* topic, byte* payload, unsigned int length)
   { 
     Serial.print("<welcomemsg, 55>");
   }
+
+  if(topicstr == "/main_node/reboot") //exposes reboot function
+  {
+    ESP.restart();
+  }
 }
 
 void loop() 
