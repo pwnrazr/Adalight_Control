@@ -1,1 +1,0 @@
-Slave STM32F103C8T6. Controls the LEDs and accept communications through serial.
