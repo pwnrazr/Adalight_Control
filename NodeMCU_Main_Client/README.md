@@ -1,1 +1,1 @@
-ESP8266 connected to main server through MQTT. Communicates with the slave STM32F103C8T6 through Serial1.
+ESP8266 connected to main server through MQTT. Communicates with the slave STM32F103C8T6 through Serial.
