@@ -1,7 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include "wifiConf.h"
-#include "comms.h"
 #include "mqttfunc.h"
 #include "OTAfunc.h"
 
