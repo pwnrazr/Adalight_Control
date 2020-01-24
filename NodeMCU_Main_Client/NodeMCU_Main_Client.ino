@@ -1,6 +1,5 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
-//#include <Wire.h> //STM32F103 
 #include "wifiConf.h"
 #include "comms.h"
 #include "mqttfunc.h"
@@ -17,9 +16,6 @@ String ledR, ledG, ledB;
 
 void setup() 
 {
-  //pinMode(2, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
-  //Wire.begin(4, 5); //SDA, SCL
-  
   Serial.begin(115200);
   Serial1.begin(115200);
   setup_wifi();
@@ -113,8 +109,6 @@ void loop()
   
   if(currentMillis> 4094967296)
   {
-    //Serial.println("reboot");
-    //Serial.println(currentMillis);
     ESP.restart();
   }
 }

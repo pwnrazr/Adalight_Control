@@ -12,7 +12,7 @@ void OTAfunc()
   ArduinoOTA.setHostname("MainNodeMCU");
 
   // No authentication by default
-  ArduinoOTA.setPassword((const char *)"pwnrazr123");
+  ArduinoOTA.setPassword((const char *)"pwnrazr1234");
 
   ArduinoOTA.onStart([]() {
     Serial1.println("Start OTA");
