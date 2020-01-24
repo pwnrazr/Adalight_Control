@@ -16,8 +16,8 @@ String ledR, ledG, ledB;
 
 void setup() 
 {
-  Serial.begin(115200);
-  Serial1.begin(115200);
+  Serial.begin(115200); // Serial port for STM32F103C8T6 communication
+  //Serial1.begin(115200);  // Usual USB/Serial port. Uncomment to enable serial debugging
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
