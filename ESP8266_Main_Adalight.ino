@@ -18,6 +18,8 @@
 #include <ArduinoOTA.h>
 #include "settings.h"
 
+#define MQTT_QOS 0
+
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
 
@@ -49,15 +51,15 @@ void connectToMqtt() {
 void onMqttConnect(bool sessionPresent) {
   Serial.println("Connected to MQTT.");
   Serial.println("Subscribing...");
-  mqttClient.subscribe("/adalight/statecmd", 0);
-  mqttClient.subscribe("/adalight/mode", 0);
-  mqttClient.subscribe("/adalight/brightness", 0);
-  mqttClient.subscribe("/adalight/R", 0);
-  mqttClient.subscribe("/adalight/G", 0);
-  mqttClient.subscribe("/adalight/B", 0);
-  mqttClient.subscribe("/adalight/welcomemessage", 0);
-  mqttClient.subscribe("/main_node/reboot", 0);
-  mqttClient.subscribe("/main_node/reqstat", 0);
+  mqttClient.subscribe("/adalight/statecmd", MQTT_QOS);
+  mqttClient.subscribe("/adalight/mode", MQTT_QOS);
+  mqttClient.subscribe("/adalight/brightness", MQTT_QOS);
+  mqttClient.subscribe("/adalight/R", MQTT_QOS);
+  mqttClient.subscribe("/adalight/G", MQTT_QOS);
+  mqttClient.subscribe("/adalight/B", MQTT_QOS);
+  mqttClient.subscribe("/adalight/welcomemessage", MQTT_QOS);
+  mqttClient.subscribe("/main_node/reboot", MQTT_QOS);
+  mqttClient.subscribe("/main_node/reqstat", MQTT_QOS);
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
