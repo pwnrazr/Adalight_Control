@@ -23,6 +23,8 @@
 
 unsigned long heartbeat_prevMillis = 0, currentMillis;
 
+String ledR, ledG, ledB;
+
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
 
@@ -121,6 +123,20 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   if(strcmp((char*)topic, "/adalight/brightness") == 0)
   { 
     Serial.print("<brightness, " + payloadstr + ">");
+  }
+
+  if(strcmp((char*)topic, "/adalight/R") == 0)
+  {
+    ledR = payloadstr;
+  }
+  if(strcmp((char*)topic, "/adalight/G") == 0)
+  {
+    ledG = payloadstr;
+  }
+  if(strcmp((char*)topic, "/adalight/B") == 0)
+  {
+    ledB = payloadstr;
+    Serial.print("<ledRGB, " + ledR + "," + ledG + "," + ledB + ">");
   }
 }
 
