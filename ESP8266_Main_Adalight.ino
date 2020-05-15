@@ -19,6 +19,9 @@
 #include "settings.h"
 
 #define MQTT_QOS 0
+#define heartbeatInterval 15000
+
+unsigned long heartbeat_prevMillis = 0, currentMillis;
 
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
@@ -182,4 +185,11 @@ void setup() {
 
 void loop() {
   ArduinoOTA.handle();
+  
+  currentMillis = millis();
+  if (currentMillis - heartbeat_prevMillis >= heartbeatInterval) 
+  {
+    heartbeat_prevMillis = currentMillis;
+    mqttClient.publish("/nodemcu/heartbeat", MQTT_QOS, false, "Hi");
+  }
 }
