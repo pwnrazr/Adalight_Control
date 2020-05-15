@@ -87,6 +87,14 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   Serial.println("Publish received.");
   Serial.print("  topic: ");
   Serial.println(topic);
+
+  String payloadstr;
+
+  for (int i = 0; i < len; i++) 
+  {
+    payloadstr = String(payloadstr + (char)payload[i]);  //convert payload to string
+  }
+  Serial.println(payloadstr);
 }
 
 void onMqttPublish(uint16_t packetId) {
