@@ -110,7 +110,12 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     {
       mqttClient.publish("/adalight/state", MQTT_QOS, false, "0");
       Serial.print("<state, 0>");
-    } 
+    }
+  }
+
+  if(strcmp((char*)topic, "/adalight/mode") == 0)
+  {
+    Serial.print("<mode, " + payloadstr + ">");
   }
 }
 
