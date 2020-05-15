@@ -73,6 +73,21 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 void onMqttPublish(uint16_t packetId) {
 }
 
+void mqttSetup()
+{
+  wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
+  wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
+
+  mqttClient.onConnect(onMqttConnect);
+  mqttClient.onDisconnect(onMqttDisconnect);
+  mqttClient.onSubscribe(onMqttSubscribe);
+  mqttClient.onUnsubscribe(onMqttUnsubscribe);
+  mqttClient.onMessage(onMqttMessage);
+  mqttClient.onPublish(onMqttPublish);
+  mqttClient.setServer(MQTT_HOST, MQTT_PORT);
+  mqttClient.setCredentials(MQTT_USER, MQTT_PASS);
+}
+
 void otaSetup()
 {
   // Port defaults to 8266
@@ -127,21 +142,8 @@ void otaSetup()
 
 void setup() {
   Serial.begin(115200);
-  Serial.println();
-  Serial.println();
-
-  wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
-  wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
-
-  mqttClient.onConnect(onMqttConnect);
-  mqttClient.onDisconnect(onMqttDisconnect);
-  mqttClient.onSubscribe(onMqttSubscribe);
-  mqttClient.onUnsubscribe(onMqttUnsubscribe);
-  mqttClient.onMessage(onMqttMessage);
-  mqttClient.onPublish(onMqttPublish);
-  mqttClient.setServer(MQTT_HOST, MQTT_PORT);
-  mqttClient.setCredentials(MQTT_USER, MQTT_PASS);
   
+  mqttSetup();
   connectToWifi();
   otaSetup();
 }
