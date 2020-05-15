@@ -99,7 +99,7 @@ void otaSetup()
   // ArduinoOTA.setPort(8266);
 
   // Hostname defaults to esp8266-[ChipID]
-  // ArduinoOTA.setHostname("myesp8266");
+  ArduinoOTA.setHostname("MainNodeMCU");
 
   // No authentication by default
   ArduinoOTA.setPassword(OTA_PASS);
@@ -140,7 +140,7 @@ void otaSetup()
     }
   });
   ArduinoOTA.begin();
-  Serial.println("Ready");
+  Serial.println("OTA Ready");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 }
