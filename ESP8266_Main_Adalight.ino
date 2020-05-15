@@ -140,7 +140,8 @@ void setup() {
   mqttClient.onMessage(onMqttMessage);
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
-
+  mqttClient.setCredentials(MQTT_USER, MQTT_PASS);
+  
   connectToWifi();
   otaSetup();
 }
