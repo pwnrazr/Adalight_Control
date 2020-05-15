@@ -60,6 +60,13 @@ void onMqttConnect(bool sessionPresent) {
   mqttClient.subscribe("/adalight/welcomemessage", MQTT_QOS);
   mqttClient.subscribe("/main_node/reboot", MQTT_QOS);
   mqttClient.subscribe("/main_node/reqstat", MQTT_QOS);
+
+  char ipaddr[16];
+  mqttClient.publish("/nodemcu/status", MQTT_QOS, false, "Connected");
+      
+  sprintf(ipaddr, "%d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3] );
+  
+  mqttClient.publish("/nodemcu/ip", MQTT_QOS, false, ipaddr);
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
