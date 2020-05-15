@@ -90,6 +90,11 @@ void mqttSetup()
 
 void otaSetup()
 {
+  while (WiFi.status() != WL_CONNECTED) //wait for wifi to connect before ota setup
+  {
+    delay(100);
+    Serial.print(".");
+  }
   // Port defaults to 8266
   // ArduinoOTA.setPort(8266);
 
