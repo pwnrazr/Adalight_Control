@@ -117,6 +117,11 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   {
     Serial.print("<mode, " + payloadstr + ">");
   }
+  
+  if(strcmp((char*)topic, "/adalight/brightness") == 0)
+  { 
+    Serial.print("<brightness, " + payloadstr + ">");
+  }
 }
 
 void onMqttPublish(uint16_t packetId) {
