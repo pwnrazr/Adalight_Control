@@ -192,4 +192,9 @@ void loop() {
     heartbeat_prevMillis = currentMillis;
     mqttClient.publish("/nodemcu/heartbeat", MQTT_QOS, false, "Hi");
   }
+  
+  if(currentMillis> 4094967296) //reboot on overflow
+  {
+    ESP.restart();
+  }
 }
