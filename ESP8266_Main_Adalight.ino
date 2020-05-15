@@ -1,138 +1,122 @@
 #include <ESP8266WiFi.h>
-#include <PubSubClient.h>
-#include "wifiConf.h"
-#include "mqttfunc.h"
-#include "OTAfunc.h"
+#include <Ticker.h>
+#include <AsyncMqttClient.h>
 
-#include <ESP8266mDNS.h>
-#include <WiFiUdp.h>
-#include <ArduinoOTA.h>
+#define WIFI_SSID "My_Wi-Fi"
+#define WIFI_PASSWORD "my-awesome-password"
 
-unsigned long previousMillis = 0, currentMillis;
-unsigned int interval = 15000;
+#define MQTT_HOST IPAddress(192, 168, 1, 10)
+#define MQTT_PORT 1883
 
-String ledR, ledG, ledB;
+AsyncMqttClient mqttClient;
+Ticker mqttReconnectTimer;
 
-void setup() 
-{
-  Serial.begin(115200); // Serial port for STM32F103C8T6 communication
-  //Serial1.begin(115200);  // Usual USB/Serial port. Uncomment to enable serial debugging
-  setup_wifi();
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
+WiFiEventHandler wifiConnectHandler;
+WiFiEventHandler wifiDisconnectHandler;
+Ticker wifiReconnectTimer;
 
-  OTAfunc();
+void connectToWifi() {
+  Serial.println("Connecting to Wi-Fi...");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 }
 
-void callback(char* topic, byte* payload, unsigned int length) 
-{
-  String topicstr;
-  String payloadstr;
-  
-  for (int i = 0; i < length; i++) 
-  {
-    payloadstr = String(payloadstr + (char)payload[i]);  //convert payload to string
-  }
-  
-  for(int i = 0; i <= 50; i++)
-  {
-    topicstr = String(topicstr + (char)topic[i]);  //convert topic to string
-  }
+void onWifiConnect(const WiFiEventStationModeGotIP& event) {
+  Serial.println("Connected to Wi-Fi.");
+  connectToMqtt();
+}
 
-  Serial1.print("Message arrived: ");
-  Serial1.print(topicstr);
-  Serial1.print(" - ");
-  Serial1.print(payloadstr);
-  Serial1.println();
-  
-  if(topicstr=="/adalight/statecmd")
-  { 
-    if(payloadstr=="1") //On Adalight
-    {
-      client.publish("/adalight/state", "1"); //publish to topic
-      Serial.print("<state, 1>");
-    }
-    else if(payloadstr=="0") //Off Adalight
-    {
-      client.publish("/adalight/state", "0"); //publish to topic 
-      Serial.print("<state, 0>");
-    } 
-  }
-  
-  if(topicstr=="/adalight/mode")
-  {
-    Serial.print("<mode, " + payloadstr + ">");
-  }
+void onWifiDisconnect(const WiFiEventStationModeDisconnected& event) {
+  Serial.println("Disconnected from Wi-Fi.");
+  mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
+  wifiReconnectTimer.once(2, connectToWifi);
+}
 
-  if(topicstr=="/adalight/brightness")
-  { 
-    Serial.print("<brightness, " + payloadstr + ">");
-  }
-  
-  if(topicstr=="/adalight/R")
-  {
-    ledR = payloadstr;
-  }
-  if(topicstr=="/adalight/G")
-  {
-    ledG = payloadstr;
-  }
-  if(topicstr=="/adalight/B")
-  {
-    ledB = payloadstr;
-    Serial.print("<ledRGB, " + ledR + "," + ledG + "," + ledB + ">");
-  }
+void connectToMqtt() {
+  Serial.println("Connecting to MQTT...");
+  mqttClient.connect();
+}
 
-  if(topicstr=="/adalight/welcomemessage")
-  { 
-    Serial.print("<welcomemsg, 55>");
-  }
+void onMqttConnect(bool sessionPresent) {
+  Serial.println("Connected to MQTT.");
+  Serial.print("Session present: ");
+  Serial.println(sessionPresent);
+  uint16_t packetIdSub = mqttClient.subscribe("test/lol", 2);
+  Serial.print("Subscribing at QoS 2, packetId: ");
+  Serial.println(packetIdSub);
+  mqttClient.publish("test/lol", 0, true, "test 1");
+  Serial.println("Publishing at QoS 0");
+  uint16_t packetIdPub1 = mqttClient.publish("test/lol", 1, true, "test 2");
+  Serial.print("Publishing at QoS 1, packetId: ");
+  Serial.println(packetIdPub1);
+  uint16_t packetIdPub2 = mqttClient.publish("test/lol", 2, true, "test 3");
+  Serial.print("Publishing at QoS 2, packetId: ");
+  Serial.println(packetIdPub2);
+}
 
-  if(topicstr == "/main_node/reboot") //exposes reboot function
-  {
-    ESP.restart();
-  }
+void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
+  Serial.println("Disconnected from MQTT.");
 
-  if(topicstr == "/main_node/reqstat")  // Request statistics function
-  {
-    unsigned long REQ_STAT_CUR_MILLIS = millis(); // gets current millis
-
-    char REQ_STAT_CUR_TEMPCHAR[60];
-
-    snprintf(
-      REQ_STAT_CUR_TEMPCHAR,
-      60, 
-      "%d.%d.%d.%d,%lu", 
-      WiFi.localIP()[0], 
-      WiFi.localIP()[1],
-      WiFi.localIP()[2], 
-      WiFi.localIP()[3],
-      (int)REQ_STAT_CUR_MILLIS
-    );  // convert string to char array for Millis. Elegance courtesy of Shahmi Technosparks
-
-    client.publish("/main_node/curstat", REQ_STAT_CUR_TEMPCHAR); //publish to topic and tempchar as payload
+  if (WiFi.isConnected()) {
+    mqttReconnectTimer.once(2, connectToMqtt);
   }
 }
 
-void loop() 
-{
-  currentMillis = millis();
-  
-  if (!client.connected()) 
-  {
-    reconnect();
-  }
-  client.loop();
-  ArduinoOTA.handle();
+void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
+  Serial.println("Subscribe acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
+  Serial.print("  qos: ");
+  Serial.println(qos);
+}
 
-  if (currentMillis - previousMillis >= interval) 
-  {
-    previousMillis = currentMillis;
-    client.publish("/nodemcu/heartbeat", "Hi");
-  }
-  
-  if(currentMillis> 4094967296)
-  {
-    ESP.restart();
-  }
+void onMqttUnsubscribe(uint16_t packetId) {
+  Serial.println("Unsubscribe acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
+}
+
+void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
+  Serial.println("Publish received.");
+  Serial.print("  topic: ");
+  Serial.println(topic);
+  Serial.print("  qos: ");
+  Serial.println(properties.qos);
+  Serial.print("  dup: ");
+  Serial.println(properties.dup);
+  Serial.print("  retain: ");
+  Serial.println(properties.retain);
+  Serial.print("  len: ");
+  Serial.println(len);
+  Serial.print("  index: ");
+  Serial.println(index);
+  Serial.print("  total: ");
+  Serial.println(total);
+}
+
+void onMqttPublish(uint16_t packetId) {
+  Serial.println("Publish acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println();
+  Serial.println();
+
+  wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
+  wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
+
+  mqttClient.onConnect(onMqttConnect);
+  mqttClient.onDisconnect(onMqttDisconnect);
+  mqttClient.onSubscribe(onMqttSubscribe);
+  mqttClient.onUnsubscribe(onMqttUnsubscribe);
+  mqttClient.onMessage(onMqttMessage);
+  mqttClient.onPublish(onMqttPublish);
+  mqttClient.setServer(MQTT_HOST, MQTT_PORT);
+
+  connectToWifi();
+}
+
+void loop() {
 }
