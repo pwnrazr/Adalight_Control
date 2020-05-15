@@ -138,6 +138,36 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     ledB = payloadstr;
     Serial.print("<ledRGB, " + ledR + "," + ledG + "," + ledB + ">");
   }
+
+ if(strcmp((char*)topic, "/adalight/welcomemessage") == 0)
+  { 
+    Serial.print("<welcomemsg, 55>");
+  }
+
+  if(strcmp((char*)topic, "/main_node/reboot") == 0) //exposes reboot function
+  {
+    ESP.restart();
+  }
+
+  if(strcmp((char*)topic, "/main_node/reqstat") == 0)  // Request statistics function
+  {
+    unsigned long REQ_STAT_CUR_MILLIS = millis(); // gets current millis
+
+    char REQ_STAT_CUR_TEMPCHAR[60];
+
+    snprintf(
+      REQ_STAT_CUR_TEMPCHAR,
+      60, 
+      "%d.%d.%d.%d,%lu", 
+      WiFi.localIP()[0], 
+      WiFi.localIP()[1],
+      WiFi.localIP()[2], 
+      WiFi.localIP()[3],
+      (int)REQ_STAT_CUR_MILLIS
+    );  // convert string to char array for Millis. Elegance courtesy of Shahmi Technosparks
+
+    mqttClient.publish("/main_node/curstat", MQTT_QOS, false, REQ_STAT_CUR_TEMPCHAR); //publish to topic and tempchar as payload
+  }
 }
 
 void onMqttPublish(uint16_t packetId) {
