@@ -98,6 +98,20 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     payloadstr = String(payloadstr + (char)payload[i]);  //convert payload to string
   }
   Serial.println(payloadstr);
+
+  if(strcmp((char*)topic, "/adalight/statecmd") == 0)
+  { 
+    if(payloadstr=="1") //On Adalight
+    {
+      mqttClient.publish("/adalight/state", MQTT_QOS, false, "1");
+      Serial.print("<state, 1>");
+    }
+    else if(payloadstr=="0") //Off Adalight
+    {
+      mqttClient.publish("/adalight/state", MQTT_QOS, false, "0");
+      Serial.print("<state, 0>");
+    } 
+  }
 }
 
 void onMqttPublish(uint16_t packetId) {
