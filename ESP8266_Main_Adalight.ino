@@ -48,6 +48,16 @@ void connectToMqtt() {
 
 void onMqttConnect(bool sessionPresent) {
   Serial.println("Connected to MQTT.");
+  Serial.println("Subscribing...");
+  mqttClient.subscribe("/adalight/statecmd", 0);
+  mqttClient.subscribe("/adalight/mode", 0);
+  mqttClient.subscribe("/adalight/brightness", 0);
+  mqttClient.subscribe("/adalight/R", 0);
+  mqttClient.subscribe("/adalight/G", 0);
+  mqttClient.subscribe("/adalight/B", 0);
+  mqttClient.subscribe("/adalight/welcomemessage", 0);
+  mqttClient.subscribe("/main_node/reboot", 0);
+  mqttClient.subscribe("/main_node/reqstat", 0);
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
