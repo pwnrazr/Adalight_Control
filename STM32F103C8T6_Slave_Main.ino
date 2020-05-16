@@ -14,11 +14,11 @@ bool ledstate = true;
 bool adalightEN = true;
 bool welcomemsg = false;
 
-unsigned int curMode = 1;   //defaults to adalight
-unsigned int brightness = 255;
-unsigned int ledR = 255;
-unsigned int ledG = 255;
-unsigned int ledB = 255;
+byte curMode = 1;   //defaults to adalight
+byte brightness = 255;
+byte ledR = 255;
+byte ledG = 255;
+byte ledB = 255;
 
 void setup() 
 {
