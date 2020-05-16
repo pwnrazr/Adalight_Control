@@ -2,7 +2,6 @@
 #include "ledFunc.h"
 #include "serialFunc.h"
 #include "ledEffects.h"
-#include "comms.h"
 
 //My defines
 
