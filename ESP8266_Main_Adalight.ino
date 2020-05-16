@@ -17,6 +17,7 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include "settings.h"
+#include "serialFunc.h"
 
 #define MQTT_QOS 0
 #define heartbeatInterval 15000
@@ -253,8 +254,27 @@ void setup() {
   otaSetup();
 }
 
-void loop() {
+void loop() { 
   ArduinoOTA.handle();
+  
+  recvWithStartEndMarkers();
+  if (newData == true) 
+  {
+    strcpy(tempChars, receivedChars);
+    parseData();
+    
+    serialDebug();  //uncomment to enable serial input debug
+    //test for now 
+    if(strcmp (messageRecv,"test") == 0)
+    { 
+      Serial.println("testSuccess");
+      Serial.println(integer01Recv);
+      Serial.println(integer02Recv);
+      Serial.println(integer03Recv);
+    }
+  
+    newData = false;  //finishes serial data parsing
+  }
   
   currentMillis = millis();
   if (currentMillis - heartbeat_prevMillis >= heartbeatInterval) 
