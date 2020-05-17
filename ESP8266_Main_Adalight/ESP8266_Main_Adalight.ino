@@ -25,7 +25,7 @@
 unsigned long heartbeat_prevMillis = 0, currentMillis;
 
 #define waitACKInterval 50
-#define MAX_ACK_RETRY 60  //60 times or 3 seconds
+#define MAX_ACK_RETRY 20
 unsigned long waitACK_prevMillis = 0;
 String currentACK;
 bool waitACK = false;
@@ -109,6 +109,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   }
   Serial.println(payloadstr);
 
+  CUR_ACK_TRY = 0;
+  
   if(strcmp((char*)topic, "/adalight/statecmd") == 0)
   { 
     waitACK = true;
@@ -309,6 +311,7 @@ void loop() {
       waitACK_prevMillis = currentMillis;
       Serial.println("noACK! Resending...");
       Serial.println(currentACK);
+      Serial.print("CUR_ACK_TRY:");
       Serial.println(CUR_ACK_TRY);
       CUR_ACK_TRY++;
       }
