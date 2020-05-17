@@ -45,11 +45,13 @@ void loop()
     if(strcmp (messageRecv,"mode") == 0)
     {
       adalightMode(integer01Recv);
+      Serial1.println("<ack, 1, 2, 3>");
     }
     
     if(strcmp (messageRecv,"brightness") == 0)
     {
       adalightBrightness(integer01Recv);
+      Serial1.println("<ack, 1, 2, 3>");
     }
     
     if(strcmp (messageRecv,"ledRGB") == 0)

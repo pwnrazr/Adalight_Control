@@ -127,11 +127,15 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   if(strcmp((char*)topic, "/adalight/mode") == 0)
   {
     Serial.print("<mode, " + payloadstr + ">");
+    currentACK = "<mode, " + payloadstr + ">";
+    waitACK = true;
   }
   
   if(strcmp((char*)topic, "/adalight/brightness") == 0)
   { 
     Serial.print("<brightness, " + payloadstr + ">");
+    currentACK = "/adalight/brightness";
+    waitACK = true;
   }
 
   if(strcmp((char*)topic, "/adalight/R") == 0)
