@@ -21,10 +21,15 @@
 
 #define MQTT_QOS 0
 #define heartbeatInterval 15000
+#define waitACKInterval 50
+
+bool waitACK = false;
 
 unsigned long heartbeat_prevMillis = 0, currentMillis;
+unsigned long waitACK_prevMillis = 0;
 
 String ledR, ledG, ledB;
+String currentACK;
 
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
@@ -104,15 +109,18 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 
   if(strcmp((char*)topic, "/adalight/statecmd") == 0)
   { 
+    waitACK = true;
     if(payloadstr=="1") //On Adalight
     {
       mqttClient.publish("/adalight/state", MQTT_QOS, false, "1");
       Serial.print("<state, 1>");
+      currentACK = "<state, 1>";
     }
     else if(payloadstr=="0") //Off Adalight
     {
       mqttClient.publish("/adalight/state", MQTT_QOS, false, "0");
       Serial.print("<state, 0>");
+      currentACK = "<state, 0>";
     }
   }
 
@@ -138,6 +146,9 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   {
     ledB = payloadstr;
     Serial.print("<ledRGB, " + ledR + "," + ledG + "," + ledB + ">");
+    
+    currentACK = "<ledRGB, " + ledR + "," + ledG + "," + ledB + ">";
+    waitACK = true;
   }
 
  if(strcmp((char*)topic, "/adalight/welcomemessage") == 0)
@@ -264,16 +275,25 @@ void loop() {
     parseData();
     
     serialDebug();  //uncomment to enable serial input debug
-    //test for now 
-    if(strcmp (messageRecv,"test") == 0)
+    
+    //ACK
+    if(strcmp (messageRecv,"ack") == 0)
     { 
-      Serial.println("testSuccess");
-      Serial.println(integer01Recv);
-      Serial.println(integer02Recv);
-      Serial.println(integer03Recv);
+      Serial.println("ACK received!");
+      currentACK = "NuLL";
+      waitACK = false;
     }
   
     newData = false;  //finishes serial data parsing
+  }
+
+  if(waitACK==true)
+  {
+    if(currentMillis - waitACK_prevMillis >= waitACKInterval){
+      waitACK_prevMillis = currentMillis;
+      Serial.println("noACK! Resending...");
+      Serial.println(currentACK);
+    }
   }
   
   currentMillis = millis();
