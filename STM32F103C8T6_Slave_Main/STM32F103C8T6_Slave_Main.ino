@@ -63,6 +63,7 @@ void loop()
     if(strcmp (messageRecv,"welcomemsg") == 0)
     {
       welcomemsg = true;
+      Serial1.println("<ack, 1, 2, 3>");
     }
   
     newData = false;  //finishes serial data parsing

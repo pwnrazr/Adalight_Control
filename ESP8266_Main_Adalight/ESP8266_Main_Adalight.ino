@@ -158,6 +158,8 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
  if(strcmp((char*)topic, "/adalight/welcomemessage") == 0)
   { 
     Serial.print("<welcomemsg, 55>");
+    currentACK = "<welcomemsg, 55>";
+    waitACK = true;
   }
 
   if(strcmp((char*)topic, "/main_node/reboot") == 0) //exposes reboot function
