@@ -280,7 +280,7 @@ void loop() {
     strcpy(tempChars, receivedChars);
     parseData();
     
-    serialDebug();  //uncomment to enable serial input debug
+    //serialDebug();  //uncomment to enable serial input debug
     
     //ACK
     if(strcmp (messageRecv,"ack") == 0)
