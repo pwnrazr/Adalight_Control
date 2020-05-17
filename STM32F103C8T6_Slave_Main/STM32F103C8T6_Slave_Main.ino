@@ -7,7 +7,7 @@
 
 int previousMillis = 0;
 
-#define interval 40  //25 fps refresh
+#define interval 16  //62.5 fps refresh
 
 bool ledstate = true;
 bool adalightEN = true;
