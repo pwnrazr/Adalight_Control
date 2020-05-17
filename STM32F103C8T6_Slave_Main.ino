@@ -39,6 +39,7 @@ void loop()
     if(strcmp (messageRecv,"state") == 0)
     { 
       adalightState(integer01Recv);
+      Serial1.println("<ack, 1, 2, 3>");
     }
   
     if(strcmp (messageRecv,"mode") == 0)
@@ -54,6 +55,7 @@ void loop()
     if(strcmp (messageRecv,"ledRGB") == 0)
     {
       adalightRGB(integer01Recv,  integer02Recv,  integer03Recv);
+      Serial1.println("<ack, 1, 2, 3>");
     }
 
     if(strcmp (messageRecv,"welcomemsg") == 0)
