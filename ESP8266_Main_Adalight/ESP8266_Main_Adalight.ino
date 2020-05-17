@@ -21,15 +21,16 @@
 
 #define MQTT_QOS 0
 #define heartbeatInterval 15000
-#define waitACKInterval 50
-
-bool waitACK = false;
 
 unsigned long heartbeat_prevMillis = 0, currentMillis;
-unsigned long waitACK_prevMillis = 0;
 
-String ledR, ledG, ledB;
+#define waitACKInterval 50
+#define MAX_ACK_RETRY 60  //60 times or 3 seconds
+unsigned long waitACK_prevMillis = 0;
 String currentACK;
+bool waitACK = false;
+byte CUR_ACK_TRY = 0;
+String ledR, ledG, ledB;
 
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
@@ -71,6 +72,7 @@ void onMqttConnect(bool sessionPresent) {
   mqttClient.subscribe("/adalight/welcomemessage", MQTT_QOS);
   mqttClient.subscribe("/main_node/reboot", MQTT_QOS);
   mqttClient.subscribe("/main_node/reqstat", MQTT_QOS);
+  mqttClient.subscribe("/adalight/acktest", MQTT_QOS);
 
   char ipaddr[16];
   mqttClient.publish("/nodemcu/status", MQTT_QOS, false, "Connected");
@@ -159,6 +161,12 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   { 
     Serial.print("<welcomemsg, 55>");
     currentACK = "<welcomemsg, 55>";
+    waitACK = true;
+  }
+  //ACKTEST
+  if(strcmp((char*)topic, "/adalight/acktest") == 0)
+  { 
+    Serial.println("BEGIN ACK TEST");
     waitACK = true;
   }
 
@@ -296,9 +304,20 @@ void loop() {
   if(waitACK==true)
   {
     if(currentMillis - waitACK_prevMillis >= waitACKInterval){
+      if(CUR_ACK_TRY < MAX_ACK_RETRY)
+      {
       waitACK_prevMillis = currentMillis;
       Serial.println("noACK! Resending...");
       Serial.println(currentACK);
+      Serial.println(CUR_ACK_TRY);
+      CUR_ACK_TRY++;
+      }
+      else
+      {
+        waitACK = false;
+        CUR_ACK_TRY = 0;
+        Serial.println("Retry ACK timeout");
+      }
     }
   }
   
