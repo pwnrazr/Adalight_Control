@@ -311,8 +311,8 @@ void loop() {
       waitACK_prevMillis = currentMillis;
       Serial.println("noACK! Resending...");
       Serial.println(currentACK);
-      Serial.print("CUR_ACK_TRY:");
-      Serial.println(CUR_ACK_TRY);
+      //Serial.print("CUR_ACK_TRY:");
+      //Serial.println(CUR_ACK_TRY);
       CUR_ACK_TRY++;
       }
       else
