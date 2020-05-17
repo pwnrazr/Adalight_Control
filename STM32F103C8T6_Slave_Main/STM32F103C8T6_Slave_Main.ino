@@ -38,32 +38,32 @@ void loop()
     
     if(strcmp (messageRecv,"state") == 0)
     { 
-      adalightState(integer01Recv);
       Serial1.println("<ack, 1, 2, 3>");
+      adalightState(integer01Recv);
     }
   
     if(strcmp (messageRecv,"mode") == 0)
     {
-      adalightMode(integer01Recv);
       Serial1.println("<ack, 1, 2, 3>");
+      adalightMode(integer01Recv);
     }
     
     if(strcmp (messageRecv,"brightness") == 0)
     {
-      adalightBrightness(integer01Recv);
       Serial1.println("<ack, 1, 2, 3>");
+      adalightBrightness(integer01Recv);
     }
     
     if(strcmp (messageRecv,"ledRGB") == 0)
     {
-      adalightRGB(integer01Recv,  integer02Recv,  integer03Recv);
       Serial1.println("<ack, 1, 2, 3>");
+      adalightRGB(integer01Recv,  integer02Recv,  integer03Recv);
     }
 
     if(strcmp (messageRecv,"welcomemsg") == 0)
     {
-      welcomemsg = true;
       Serial1.println("<ack, 1, 2, 3>");
+      welcomemsg = true;
     }
   
     newData = false;  //finishes serial data parsing
