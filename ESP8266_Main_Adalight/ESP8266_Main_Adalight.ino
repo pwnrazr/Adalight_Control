@@ -30,7 +30,6 @@ unsigned long waitACK_prevMillis = 0;
 String currentACK;
 bool waitACK = false;
 byte CUR_ACK_TRY = 0;
-String ledR, ledG, ledB;
 
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
@@ -66,14 +65,12 @@ void onMqttConnect(bool sessionPresent) {
   mqttClient.subscribe("/adalight/statecmd", MQTT_QOS);
   mqttClient.subscribe("/adalight/mode", MQTT_QOS);
   mqttClient.subscribe("/adalight/brightness", MQTT_QOS);
-  mqttClient.subscribe("/adalight/R", MQTT_QOS);
-  mqttClient.subscribe("/adalight/G", MQTT_QOS);
-  mqttClient.subscribe("/adalight/B", MQTT_QOS);
   mqttClient.subscribe("/adalight/welcomemessage", MQTT_QOS);
   mqttClient.subscribe("/main_node/reboot", MQTT_QOS);
   mqttClient.subscribe("/main_node/reqstat", MQTT_QOS);
   mqttClient.subscribe("/adalight/acktest", MQTT_QOS);
-
+  mqttClient.subscribe("/adalight/RGB", MQTT_QOS);
+  
   char ipaddr[16];
   mqttClient.publish("/nodemcu/status", MQTT_QOS, false, "Connected");
       
@@ -142,23 +139,13 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
     waitACK = true;
   }
 
-  if(strcmp((char*)topic, "/adalight/R") == 0)
+  if(strcmp((char*)topic, "/adalight/RGB") == 0)
   {
-    ledR = payloadstr;
-  }
-  if(strcmp((char*)topic, "/adalight/G") == 0)
-  {
-    ledG = payloadstr;
-  }
-  if(strcmp((char*)topic, "/adalight/B") == 0)
-  {
-    ledB = payloadstr;
-    Serial.print("<ledRGB, " + ledR + "," + ledG + "," + ledB + ">");
-    
-    currentACK = "<ledRGB, " + ledR + "," + ledG + "," + ledB + ">";
+    Serial.print("<ledRGB, " + payloadstr + ">");
+    currentACK = "<ledRGB, " + payloadstr + ">";
     waitACK = true;
   }
-
+  
  if(strcmp((char*)topic, "/adalight/welcomemessage") == 0)
   { 
     Serial.print("<welcomemsg, 55>");
