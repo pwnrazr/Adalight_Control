@@ -263,6 +263,7 @@ void otaSetup()
 void setup() {
   Serial.begin(115200);
   
+  WiFi.mode(WIFI_STA);
   mqttSetup();
   connectToWifi();
   otaSetup();
